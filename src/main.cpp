@@ -6,6 +6,42 @@
 #include <iostream>
 #include <fstream>
 
+class Shape {
+public:
+    float x;
+    float y;
+    float velX;
+    float velY;
+    int colorR;
+    int colorG;
+    int colorB;
+    std::string name;
+    int scale;
+    bool active;
+
+    void update(){
+
+    }
+
+    void render() {
+
+    }
+ 
+};
+
+class Circle : public Shape {
+public:
+    float radius;
+
+};
+
+class Square : public Shape {
+public:
+    float height;
+    float width;
+    int scale = 1;
+
+};
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -58,7 +94,12 @@ int main(void)
         //move circle
         circX+=circSpeedX;
         circY+=circSpeedY;
-
+        if (circX - circRadius <= 0.0f || circX + circRadius >= screenWidth) {
+            circSpeedX = -circSpeedX;
+        }
+        if (circY -  circRadius <= 0.0f || circY + circRadius >= screenHeight) {
+            circSpeedY = -circSpeedY;
+        }
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
@@ -80,7 +121,7 @@ int main(void)
 
                 //draw the text (using the text size to help draw it in the corner
                 //(font,c string, vector2, font size, font spaceing, color)
-                DrawTextEx(font, strText.c_str(), { 0.0f, screenHeight - textSize.y }, 18, 1, WHITE);
+                DrawTextEx(font, strText.c_str(), { circX - (textSize.x/2), circY - (textSize.y/2)}, 18, 1, WHITE);
             }
 
             //********** ImGUI Content *********
@@ -101,6 +142,9 @@ int main(void)
 
                     //slider, again directly modifies the value and limites between 0 and 300 for this example
                     ImGui::SliderFloat("Radius",&circRadius,0.0f,300.0f);
+
+                    ImGui::SliderFloat("X Velocity",&circSpeedX, 0.0f, 300.0f);
+                    ImGui::SliderFloat("Y Velocity", &circSpeedY, 0.0f, 300.0f);
                     
                     //color picker button, directly modifies the color (3 element float array)
                     ImGui::ColorEdit3("Circle Color",color);
@@ -121,6 +165,8 @@ int main(void)
                         circX=50.0;
                         circY=50.0;
                         circRadius=50;
+                        circSpeedX = 1.0f;
+                        circSpeedY = 0.5f;
                     }
                 //ends this window
                 ImGui::End();
