@@ -48,7 +48,7 @@ public:
 
 };
 
-class Square : public Shape {
+class Rect : public Shape {
 public:
     float height;
     float width;
@@ -93,6 +93,16 @@ int main(void)
     float circY=50.0f;
     float color[3] = {0.0f,0.0,1.0f}; //color is from 0-1
 
+    float recHeight = 50;
+    float recWidth = 50;
+    float recSpeedX = 7.0f;
+    float recSpeedY = 0.5f;
+    bool drawRec = true;
+    float recX = 50.0f;
+    float recY = 50.0f;
+    
+
+
     //Let's draw some text to the screen too
     bool drawText=true;
     std::string strText= "Some Text";
@@ -117,6 +127,12 @@ int main(void)
         if (circY -  circRadius <= 0.0f || circY + circRadius >= screenHeight) { //circle hits the top or bottom
             circSpeedY = -circSpeedY; // flip direction of y velocity
         }
+        
+
+        //move rectangle
+        recX += recSpeedX;
+        recY += recSpeedY;
+
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
@@ -130,6 +146,9 @@ int main(void)
                 DrawCircle((int)circX, (int)circY, circRadius, ColorFromNormalized({ color[0],color[1],color[2],1.0f }));
             }
             
+            if (drawRec) {
+                DrawRectangle((int)recX, (int) recY, (int) recWidth, (int) recHeight, ColorFromNormalized({ color[0],color[1],color[2],1.0f }));
+            }
             //draw the text
             if(drawText){
                 //get the size (x and y) of the text object
@@ -185,6 +204,14 @@ int main(void)
                         circRadius=50;
                         circSpeedX = 1.0f;
                         circSpeedY = 0.5f;
+                    }
+                    ImGui::SameLine();
+
+                    if (ImGui::Button("Reset Square")) {
+                        recSpeedX = 7.0f;
+                       recSpeedY = 0.5f;
+                        recX = 50.0f;
+                        recY = 50.0f;
                     }
                 //ends this window
                 ImGui::End();
