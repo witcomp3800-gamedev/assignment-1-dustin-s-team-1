@@ -6,6 +6,9 @@
 #include <iostream>
 #include <fstream>
 
+const int screenWidth = 1280;
+const int screenHeight = 800;
+
 class Shape {
 public:
     float x;
@@ -19,9 +22,7 @@ public:
     int scale;
     bool active;
 
-    void update(){
-
-    }
+    
 
     void render() {
 
@@ -32,6 +33,18 @@ public:
 class Circle : public Shape {
 public:
     float radius;
+
+
+     void update() {
+        x += velX;
+        y += velY;
+        if (x - radius <= 0.0f || x + radius >= screenWidth) {
+            velX = -velX;
+        }
+        if (y -radius <= 0.0f || y + radius >= screenHeight) {
+            velY = -velY;
+        }
+    }
 
 };
 
@@ -49,8 +62,7 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 1280;
-    const int screenHeight = 800;
+    
 
     SetConfigFlags(FLAG_WINDOW_HIGHDPI);
     InitWindow(screenWidth, screenHeight, "Assignment 1 Starter Code");
@@ -192,6 +204,7 @@ int main(void)
     rlImGuiShutdown();    // Shuts down the raylib ImGui backend
     UnloadFont(font);     // Remove font from memory
     CloseWindow();        // Close window and OpenGL context
+    configFile.close();
     //--------------------------------------------------------------------------------------
 
     return 0;
