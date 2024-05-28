@@ -61,7 +61,12 @@ int main(void)
     ImGui::GetStyle().ScaleAllSizes(2);
 
     // Set raylib to target 60 frames-per-second (this does not mean it will actually RUN at 60 fps)
-    SetTargetFPS(60);               
+    SetTargetFPS(60);      
+    
+    //read in config file
+    std::fstream configFile;
+    configFile.open(". / bin / assets / input.txt");
+
 
     // General variables
     //--------------------------------------------------------------------------------------
