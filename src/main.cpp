@@ -111,11 +111,11 @@ int main(void)
         //move circle
         circX+=circSpeedX;
         circY+=circSpeedY;
-        if (circX - circRadius <= 0.0f || circX + circRadius >= screenWidth) {
-            circSpeedX = -circSpeedX;
+        if (circX - circRadius <= 0.0f || circX + circRadius >= screenWidth) { //circle hits the left or right side
+            circSpeedX = -circSpeedX;// flip direction of x velocity
         }
-        if (circY -  circRadius <= 0.0f || circY + circRadius >= screenHeight) {
-            circSpeedY = -circSpeedY;
+        if (circY -  circRadius <= 0.0f || circY + circRadius >= screenHeight) { //circle hits the top or bottom
+            circSpeedY = -circSpeedY; // flip direction of y velocity
         }
         // Draw
         //----------------------------------------------------------------------------------
@@ -160,6 +160,7 @@ int main(void)
                     //slider, again directly modifies the value and limites between 0 and 300 for this example
                     ImGui::SliderFloat("Radius",&circRadius,0.0f,300.0f);
 
+                    //slider to adjust both x and y velocity
                     ImGui::SliderFloat("X Velocity",&circSpeedX, 0.0f, 300.0f);
                     ImGui::SliderFloat("Y Velocity", &circSpeedY, 0.0f, 300.0f);
                     
@@ -204,7 +205,7 @@ int main(void)
     rlImGuiShutdown();    // Shuts down the raylib ImGui backend
     UnloadFont(font);     // Remove font from memory
     CloseWindow();        // Close window and OpenGL context
-    configFile.close();
+    configFile.close();   // Close config file
     //--------------------------------------------------------------------------------------
 
     return 0;
