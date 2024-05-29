@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 const int screenWidth = 1280;
 const int screenHeight = 800;
@@ -18,41 +19,72 @@ public:
     int colorR;
     int colorG;
     int colorB;
+    bool active = true;
     std::string name;
-    int scale;
-    bool active;
+    int scale = 1;
 
     
+    Shape(float x, float y, float velX, float velY, int colorR, int colorG, int colorB, std::string name ): x(x), y(y),velX(velX), velY(velY), colorR(colorR),colorG(colorG),colorB(colorB), name(name){}
 
-    void render() {
-
+    void update(){
+        x += velX;
+        y += velY;
     }
+
+    
  
 };
 
 class Circle : public Shape {
 public:
+
     float radius;
 
 
-     void update() {
-        x += velX;
-        y += velY;
-        if (x - radius <= 0.0f || x + radius >= screenWidth) {
-            velX = -velX;
-        }
-        if (y -radius <= 0.0f || y + radius >= screenHeight) {
-            velY = -velY;
-        }
+   
+    Circle(float x, float y, float velX, float velY, int colorR, int colorG, int colorB,std::string name, float radius):Shape(x,y,velX,velY,colorR,colorG,colorB,name), radius(radius) {}
+
+   
+    void circUpdate() {
+         update();
+         if (x - radius*scale <= 0.0f || x + radius*scale >= screenWidth) { //circle hits the left or right side
+             velX = -velX;// flip direction of x velocity
+         }
+         if (y - radius*scale <= 0.0f || y + radius*scale >= screenHeight) { //circle hits the top or bottom
+             velY = -velY; // flip direction of y velocity
+         }
+
+    }
+    void render() {
+        DrawCircle((int)x, (int)y, radius*scale, ColorFromNormalized({ (float)colorR,(float)colorG,(float)colorB,1.0f }));
     }
 
 };
 
 class Rect : public Shape {
 public:
+    
     float height;
     float width;
-    int scale = 1;
+
+    
+   
+    Rect(float x, float y, float velX, float velY, int colorR, int colorG, int colorB,std::string name, float height, float width):Shape(x, y, velX, velY, colorR, colorG, colorB,name), height(height), width(width) {}
+    
+
+    void rectUpdate() {
+        update();
+        if (x <= 0.0 || x + width >= screenWidth) {
+            velX = -velX;// flip direction of x velocity
+        }
+        if (y <= 0.0 || y + height >= screenHeight) {
+            velY = -velY;// flip direction of x velocity
+        }
+    }
+    void render() {
+        DrawRectangle((int)x, (int)y, (int)width, (int)height, ColorFromNormalized({ (float)colorR,(float)colorG,(float)colorB,1.0f }));
+    }
+   
 
 };
 //------------------------------------------------------------------------------------
@@ -77,29 +109,36 @@ int main(void)
     
     //read in config file
     std::fstream configFile;
-    configFile.open(". / bin / assets / input.txt");
+    configFile.open("assets / input.txt");
 
+
+    while (configFile.eof()) {
+
+
+
+
+    }
 
     // General variables
     //--------------------------------------------------------------------------------------
 
     //shape properties to draw on the screen (circle for this example)
     //units of size and speed are in pixels
-    float circRadius=50;
-    float circSpeedX=1.0f;
-    float circSpeedY=0.5f;
-    bool drawCirc=true;
-    float circX=50.0f;
-    float circY=50.0f;
-    float color[3] = {0.0f,0.0,1.0f}; //color is from 0-1
+    //color is from 0-1
 
-    float recHeight = 50;
-    float recWidth = 50;
-    float recSpeedX = 7.0f;
-    float recSpeedY = 0.5f;
-    bool drawRec = true;
-    float recX = 50.0f;
-    float recY = 50.0f;
+   
+    std::cout << "fgdfmklvmfdkl;mv" << std::endl;
+    Circle circ1(50.0f,50.0f,1.0f,0.5f,0,0,1,"Circle",50);
+    Rect rec1(50.0f, 50.0f, 1.0f, 0.5f, 0, 0, 1, "Rectangle",50.0f, 50.0f);
+
+    bool isActive = true;
+    
+    std::vector<Shape*> container;
+    container.push_back(&circ1);
+    container.push_back(&rec1);
+
+    
+   
     
 
 
@@ -119,19 +158,16 @@ int main(void)
         //----------------------------------------------------------------------------------
 
         //move circle
-        circX+=circSpeedX;
-        circY+=circSpeedY;
-        if (circX - circRadius <= 0.0f || circX + circRadius >= screenWidth) { //circle hits the left or right side
-            circSpeedX = -circSpeedX;// flip direction of x velocity
-        }
-        if (circY -  circRadius <= 0.0f || circY + circRadius >= screenHeight) { //circle hits the top or bottom
-            circSpeedY = -circSpeedY; // flip direction of y velocity
-        }
+       
+        //circ1.update(circ1.x,circ1.y, circ1.velX, circ1.velY );
+
+
+        circ1.circUpdate();
+        rec1.rectUpdate();
         
 
-        //move rectangle
-        recX += recSpeedX;
-        recY += recSpeedY;
+      
+        
 
         // Draw
         //----------------------------------------------------------------------------------
@@ -142,13 +178,12 @@ int main(void)
             //********** Raylib Drawing Content **********
 
             //draw the cricle (center x, center y, radius, color(r,g,b,a))
-            if(drawCirc){
-                DrawCircle((int)circX, (int)circY, circRadius, ColorFromNormalized({ color[0],color[1],color[2],1.0f }));
+            if(isActive){
+                circ1.render();
+                rec1.render();
             }
-            
-            if (drawRec) {
-                DrawRectangle((int)recX, (int) recY, (int) recWidth, (int) recHeight, ColorFromNormalized({ color[0],color[1],color[2],1.0f }));
-            }
+           
+                
             //draw the text
             if(drawText){
                 //get the size (x and y) of the text object
@@ -157,7 +192,7 @@ int main(void)
 
                 //draw the text (using the text size to help draw it in the corner
                 //(font,c string, vector2, font size, font spaceing, color)
-                DrawTextEx(font, strText.c_str(), { circX - (textSize.x/2), circY - (textSize.y/2)}, 18, 1, WHITE);
+                DrawTextEx(font, strText.c_str(), { circ1.x - (textSize.x/2), circ1.y - (textSize.y/2)}, 18, 1, WHITE);
             }
 
             //********** ImGUI Content *********
@@ -172,22 +207,27 @@ int main(void)
                 ImGui::Begin("My Window",NULL,ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse);
                     ImGui::Text("The Window Text!");
                     //checkboxes, they directly modify the value (which is why we send a reference)
-                    ImGui::Checkbox("Draw Cricle",&drawCirc);
+                    ImGui::Checkbox("Draw Cricle",&isActive);
                     ImGui::SameLine();
                     ImGui::Checkbox("Draw Text",&drawText);
 
                     //slider, again directly modifies the value and limites between 0 and 300 for this example
-                    ImGui::SliderFloat("Radius",&circRadius,0.0f,300.0f);
+                    ImGui::SliderFloat("Radius",&circ1.radius,0.0f,300.0f);
 
                     //slider to adjust both x and y velocity
-                    ImGui::SliderFloat("X Velocity",&circSpeedX, 0.0f, 300.0f);
-                    ImGui::SliderFloat("Y Velocity", &circSpeedY, 0.0f, 300.0f);
+                    ImGui::SliderFloat("X Velocity",&circ1.velX, 0.0f, 300.0f);
+                    ImGui::SliderFloat("Y Velocity", &circ1.velY, 0.0f, 300.0f);
                     
                     //color picker button, directly modifies the color (3 element float array)
-                    ImGui::ColorEdit3("Circle Color",color);
+                    //ImGui::ColorEdit3("Circle Color",color);
                     
                     //text input field, directly modifies the string
                     ImGui::InputText("Text",&newText);
+
+                    //ImGui::BeginCombo("Objects", "circ",5);
+                    //ImGui::Combo("objects", &container, container.size(), 5);
+
+                    //ImGui::EndCombo();
                     
                     //buttons, returns true if clicked on this frame
                     if(ImGui::Button("Set Text")){
@@ -199,26 +239,26 @@ int main(void)
 
                     //Another button
                     if(ImGui::Button("Reset Circle")){
-                        circX=50.0;
-                        circY=50.0;
-                        circRadius=50;
-                        circSpeedX = 1.0f;
-                        circSpeedY = 0.5f;
+                        circ1.x=50.0;
+                        circ1.y=50.0;
+                        circ1.radius=50;
+                        circ1.velX = 1.0f;
+                        circ1.velY = 0.5f;
                     }
                     ImGui::SameLine();
 
                     if (ImGui::Button("Reset Square")) {
-                        recSpeedX = 7.0f;
-                       recSpeedY = 0.5f;
-                        recX = 50.0f;
-                        recY = 50.0f;
+                        rec1.velX = 7.0f;
+                        rec1.velY = 0.5f;
+                        rec1.x = 50.0f;
+                        rec1.y = 50.0f;
                     }
                 //ends this window
                 ImGui::End();
 
                 //show ImGui Demo Content if you want to see it
                 //bool open = true;
-                //ImGui::ShowDemoWindow(&open);
+               // ImGui::ShowDemoWindow(&open);
 
             // end ImGui Content
             rlImGuiEnd();
